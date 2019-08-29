@@ -1,0 +1,138 @@
+service: andlar-api
+frameworkVersion: ">=1.1.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  region: us-east-1
+  stage: dev
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:us-east-1:*:*"
+
+functions:
+  createAuthor:
+    handler: server.author.create
+    events:
+      - http:
+          path: author
+          method: post
+          cors: true
+  listAuthors:
+    handler: server.author.list
+    events:
+      - http:
+          path: author
+          method: get
+          cors: true
+  getAuthor:
+    handler: server.author.get
+    events:
+      - http:
+          path: author/{id}
+          method: get
+          cors: true
+  updateAuthor:
+    handler: server.author.update
+    events:
+      - http:
+          path: author/{id}
+          method: put
+          cors: true
+  deleteAuthor:
+    handler: server.author.delete
+    events:
+      - http:
+          path: author/{id}
+          method: delete
+          cors: true
+  filterAuthor:
+    handler: server.author.filter
+    events:
+      - http:
+          path: author/filter
+          method: post
+          cors: true
+  createPublication:
+    handler: server.publication.create
+    events:
+      - http:
+          path: publication
+          method: post
+          cors: true
+  listPublications:
+    handler: server.publication.list
+    events:
+      - http:
+          path: publication
+          method: get
+          cors: true
+  getPublication:
+    handler: server.publication.get
+    events:
+      - http:
+          path: publication/{id}
+          method: get
+          cors: true
+  updatePublication:
+    handler: server.publication.update
+    events:
+      - http:
+          path: publication/{id}
+          method: put
+          cors: true
+  deletePublication:
+    handler: server.publication.delete
+    events:
+      - http:
+          path: publication/{id}
+          method: delete
+          cors: true
+  filterPublication:
+    handler: server.publication.filter
+    events:
+      - http:
+          path: publication/filter
+          method: post
+          cors: true
+
+resources:
+  Resources:
+    APDBDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'author'
+    APDBDynamoDbTable2:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'publication'
