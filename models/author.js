@@ -1,87 +1,62 @@
-"use strict";
-
-const dynamodb = require("aws-sdk/clients/dynamodb");
+const dynamoose = require('dynamoose');
 const uuid = require("uuid");
+
+dynamoose.AWS.config.update({
+    accessKeyId : process.env.AWS_KEY_ID,
+    secretAccessKey : process.env.AWS_KEY_SECRET,
+    region : 'us-east-1'
+});
+
+const Author = dynamoose.model('author', {
+    id: String,
+    name: String,
+    email: String,
+    birthday: String
+});
 
 class AuthorService {
 
     constructor() {
         this.table = 'author';
-        this.pageLimit = 5;
-        this.dynamoDb = new dynamodb.DocumentClient();
     }
 
     list(event, callback) {
-        const params = {
-            TableName: this.table,
-            ExclusiveStartKey: null,
-        };
-
-        return this.dynamoDb.scan(params, (err, data) => {
-            if (err) {
-                callback(err);
-            }
-            callback(err, data.Items);
-        });
+        Author.scan().exec()
+            .then(function(rows) {
+                callback(null, rows);
+            })
     }
 
     get(event, callback) {
-        const params = {
-            TableName: this.table,
-            Key: {
-                id: event.pathParameters.id
-            }
-        };
-        return this.dynamoDb.get(params, (err, data) => {
-            if (err) {
-                callback(err);
-            }
-            callback(err, data.Item);
+        Author.get({
+            id: event.pathParameters.id
+        }).then(function(row) {
+            callback(null, row);
         });
     }
 
     create(event, callback) {
         const data = JSON.parse(event.body);
         data.id = uuid.v1();
-        const params = {
-            TableName: this.table,
-            Item: data
-        };
-        return this.dynamoDb.put(params, (err, data) => {
-            if (err) {
-                callback(err);
-            }
-            callback(err, params.Item);
+
+        const author = new Author(data);
+        author.save(function (err) {
+            callback(err, data);
         });
     }
 
     update(event, callback) {
         const data = JSON.parse(event.body);
         data.id = event.pathParameters.id;
-        const params = {
-            TableName: this.table,
-            Item: data
-        };
-        return this.dynamoDb.put(params, (err, data) => {
-            if (err) {
-                callback(err);
-            }
-            callback(err, params.Item);
+
+        Author.update({id: data.id}, data, function (err) {
+            callback(err, data);
         });
     }
 
     delete(event, callback) {
-        const params = {
-            TableName: this.table,
-            Key: {
-                id: event.pathParameters.id
-            }
-        };
-        return this.dynamoDb.delete(params, (err) => {
-            if (err) {
-                callback(err);
-            }
-            callback(err, params.Key);
+        Author.delete({ id: event.pathParameters.id }, function (err) {
+            callback(err, event.pathParameters.id);
         });
     }
 
@@ -90,6 +65,7 @@ class AuthorService {
         var params = {
             TableName: this.table
         };
+
         if (data.id) {
             params.FilterExpression = "contains (#id, :id)";
             params.ExpressionAttributeNames = {
@@ -108,12 +84,11 @@ class AuthorService {
                 ":name": data.name || ' '
             };
         }
-        return this.dynamoDb.scan(params, (err, data) => {
-            if (err) {
-                callback(err);
-            }
-            callback(err, data);
-        });
+
+        Author.scan(params).exec()
+            .then(function(rows) {
+                callback(null, rows);
+            });
     }
 }
 exports.AuthorService = AuthorService;

@@ -1,49 +1,47 @@
-"use strict";
-
 const author = require("../models/publication");
 
 class PublicationRouter {
 
     static create(event, context, callback) {
-        new author.PublicationService().create(event, (error, result) => {
-            PublicationRouter.respose(context, error, result);
+        new author.PublicationService().create(event, (err, result) => {
+            PublicationRouter.respose(context, err, result);
         });
     }
     static list(event, context, callback) {
-        new author.PublicationService().list(event, (error, result) => {
-            PublicationRouter.respose(context, error, result);
+        new author.PublicationService().list(event, (err, result) => {
+            PublicationRouter.respose(context, err, result);
         });
     }
     static get(event, context, callback) {
-        new author.PublicationService().get(event, (error, result) => {
-            PublicationRouter.respose(context, error, result);
+        new author.PublicationService().get(event, (err, result) => {
+            PublicationRouter.respose(context, err, result);
         });
     }
     static update(event, context, callback) {
-        new author.PublicationService().update(event, (error, result) => {
-            PublicationRouter.respose(context, error, result);
+        new author.PublicationService().update(event, (err, result) => {
+            PublicationRouter.respose(context, err, result);
         });
     }
     static delete(event, context, callback) {
-        new author.PublicationService().delete(event, (error, result) => {
-            PublicationRouter.respose(context, error, result);
+        new author.PublicationService().delete(event, (err, result) => {
+            PublicationRouter.respose(context, err, result);
         });
     }
     static filter(event, context, callback) {
-        new author.PublicationService().filter(event, (error, result) => {
-            PublicationRouter.respose(context, error, result);
+        new author.PublicationService().filter(event, (err, result) => {
+            PublicationRouter.respose(context, err, result);
         });
     }
-    static respose(context, error, result) {
+    static respose(context, err, result) {
         const response = {
             statusCode: 200,
             headers: {
                 "Access-Control-Allow-Origin": "*"
             },
             body: JSON.stringify({
-                result: !error,
+                result: !err,
                 data: result,
-                message: error
+                message: err
             })
         };
         context.succeed(response);

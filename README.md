@@ -24,6 +24,7 @@ This is the API based on [Node.js](https://nodejs.org) which utilizes several li
 
     ```text
     aws-sdk      2.518.0
+    dynamoose    1.11.0
     uuid         3.3.3
     supertest    4.0.2
     ```
@@ -32,6 +33,23 @@ This is the API based on [Node.js](https://nodejs.org) which utilizes several li
 
     ```sh
     sls deploy
+   
+## Run the tests
+
+    npm run test
+    
+## Deploys
+
+1. If you want to deploy to dev environment, then:
+
+    ```sh
+    sls deploy --stage dev
+   ```
+    
+2. If you want to deploy to prod environment, then:
+    
+    ```sh
+    sls deploy --stage prod
     ```
 
 ## How to use the API
